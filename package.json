@@ -1,0 +1,16 @@
+{
+  "name": "my-devcamper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server",
+    "dev": "node --watch --env-file=config/config.env server"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
