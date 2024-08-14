@@ -1,3 +1,5 @@
+import Bootcamp from "../models/Bootcamp.js";
+
 // @desc      Get all bootcamps
 // @route     GET /api/v1/bootcamps
 // @access    Public
@@ -42,9 +44,13 @@ export const createBootcamp = (req, res, next) => {
 
   // const bootcamp = await Bootcamp.create(req.body);
 
-  res.status(201).json({
-    success: true,
-    // data: bootcamp
+  Bootcamp.create(req.body).then((bootcamp) => {
+    res.status(201).json({
+      success: true,
+      data: bootcamp
+    });
+  }).catch((error) => {
+    res.status(400).json({ success: false });
   });
 };
 
