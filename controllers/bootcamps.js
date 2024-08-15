@@ -4,7 +4,20 @@ import Bootcamp from "../models/Bootcamp.js";
 // @route     GET /api/v1/bootcamps
 // @access    Public
 export const getAllBootcamps = (req, res, next) => {
-  res.status(200).json(res.advancedResults);
+  Bootcamp.find().then((bootcamp) => {
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: bootcamp.length,
+      data: bootcamp
+    });
+  })
+    .catch(() => {
+      res.status(400).json({ success: false });
+    });
 };
 
 // @desc      Get single bootcamp
@@ -19,7 +32,19 @@ export const getBootcamp = (req, res, next) => {
   //   );
   // }
 
-  res.status(200).json({ success: true });
+  Bootcamp.findById(req.params.id).then((bootcamp) => {
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bootcamp
+    });
+  })
+    .catch(() => {
+      res.status(400).json({ success: false });
+    });
 };
 
 // @desc      Create new bootcamp
@@ -49,7 +74,7 @@ export const createBootcamp = (req, res, next) => {
       success: true,
       data: bootcamp
     });
-  }).catch((error) => {
+  }).catch(() => {
     res.status(400).json({ success: false });
   });
 };
@@ -86,7 +111,19 @@ export const updateBootcamp = (req, res, next) => {
   //   runValidators: true
   // });
 
-  res.status(200).json({ success: true });
+  Bootcamp.findByIdAndUpdate(req.params.id, req.body).then((bootcamp) => {
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bootcamp
+    });
+  })
+    .catch(() => {
+      res.status(400).json({ success: false });
+    });
 };
 
 // @desc      Delete bootcamp
@@ -113,7 +150,19 @@ export const deleteBootcamp = (req, res, next) => {
 
   // await bootcamp.remove();
 
-  res.status(200).json({ success: true, data: {} });
+  Bootcamp.findByIdAndDelete(req.params.id).then((bootcamp) => {
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {}
+    });
+  })
+    .catch(() => {
+      res.status(400).json({ success: false });
+    });
 };
 
 // // @desc      Get bootcamps within a radius
