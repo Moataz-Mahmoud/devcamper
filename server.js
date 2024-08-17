@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import connectToDB from './config/db.js';
+import errorHandler from './middleware/error.js';
 
 connectToDB();
 
@@ -20,6 +21,7 @@ if (process.env.NODE_ENV === 'development') {
 // mount routers
 app.use('/api/v1/bootcamps', bootcamps);
 
+app.use(errorHandler);
 
 const port = process.env.PORT || 8000;
 const server = app.listen(

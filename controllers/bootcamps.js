@@ -1,4 +1,5 @@
 import Bootcamp from "../models/Bootcamp.js";
+import ErrorResponse from "../utils/errorResponse.js";
 
 // @desc      Get all bootcamps
 // @route     GET /api/v1/bootcamps
@@ -16,7 +17,7 @@ export const getAllBootcamps = (req, res, next) => {
     });
   })
     .catch(() => {
-      res.status(400).json({ success: false });
+      next(error);
     });
 };
 
@@ -24,17 +25,11 @@ export const getAllBootcamps = (req, res, next) => {
 // @route     GET /api/v1/bootcamps/:id
 // @access    Public
 export const getBootcamp = (req, res, next) => {
-  // const bootcamp = await Bootcamp.findById(req.params.id);
-
-  // if (!bootcamp) {
-  //   return next(
-  //     new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
-  //   );
-  // }
-
   Bootcamp.findById(req.params.id).then((bootcamp) => {
     if (!bootcamp) {
-      return res.status(400).json({ success: false });
+      return next(
+        new ErrorResponse(`Bootcamp is not found with id of ${req.params.id}`, 404)
+      );
     }
 
     res.status(200).json({
@@ -42,8 +37,8 @@ export const getBootcamp = (req, res, next) => {
       data: bootcamp
     });
   })
-    .catch(() => {
-      res.status(400).json({ success: false });
+    .catch((error) => {
+      next(error);
     });
 };
 
@@ -67,15 +62,13 @@ export const createBootcamp = (req, res, next) => {
   //   );
   // }
 
-  // const bootcamp = await Bootcamp.create(req.body);
-
   Bootcamp.create(req.body).then((bootcamp) => {
     res.status(201).json({
       success: true,
       data: bootcamp
     });
-  }).catch(() => {
-    res.status(400).json({ success: false });
+  }).catch((error) => {
+    next(error);
   });
 };
 
@@ -83,13 +76,6 @@ export const createBootcamp = (req, res, next) => {
 // @route     PUT /api/v1/bootcamps/:id
 // @access    Private
 export const updateBootcamp = (req, res, next) => {
-  // let bootcamp = await Bootcamp.findById(req.params.id);
-
-  // if (!bootcamp) {
-  //   return next(
-  //     new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
-  //   );
-  // }
 
   // // Make sure user is bootcamp owner
   // if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
@@ -113,7 +99,9 @@ export const updateBootcamp = (req, res, next) => {
 
   Bootcamp.findByIdAndUpdate(req.params.id, req.body).then((bootcamp) => {
     if (!bootcamp) {
-      return res.status(400).json({ success: false });
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+      );
     }
 
     res.status(200).json({
@@ -121,8 +109,8 @@ export const updateBootcamp = (req, res, next) => {
       data: bootcamp
     });
   })
-    .catch(() => {
-      res.status(400).json({ success: false });
+    .catch((error) => {
+      next(error);
     });
 };
 
@@ -148,11 +136,11 @@ export const deleteBootcamp = (req, res, next) => {
   //   );
   // }
 
-  // await bootcamp.remove();
-
   Bootcamp.findByIdAndDelete(req.params.id).then((bootcamp) => {
     if (!bootcamp) {
-      return res.status(400).json({ success: false });
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
+      );
     }
 
     res.status(200).json({
@@ -160,8 +148,8 @@ export const deleteBootcamp = (req, res, next) => {
       data: {}
     });
   })
-    .catch(() => {
-      res.status(400).json({ success: false });
+    .catch((error) => {
+      next(error);
     });
 };
 
