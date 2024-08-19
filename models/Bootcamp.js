@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+import geocoder from '../utils/geocoder.js';
 
 const BootcampSchema = new mongoose.Schema(
   {
@@ -110,10 +111,31 @@ const BootcampSchema = new mongoose.Schema(
   }
 );
 
-// Create bootcamp slug from the name
+// create bootcamp slug from the name
 BootcampSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
+});
+
+// geocode & create location field
+BootcampSchema.pre('save', function (next) {
+  geocoder.geocode(this.address).then((location) => {
+    this.location = {
+      type: 'Point',
+      coordinates: [location[0].longitude, location[0].latitude],
+      formattedAddress: location[0].formattedAddress,
+      street: location[0].streetName,
+      city: location[0].city,
+      state: location[0].stateCode,
+      zipcode: location[0].zipcode,
+      country: location[0].countryCode
+    };
+
+    // stop saving address in DB, it's auto-generated now!
+    this.address = undefined;
+
+    next();
+  });
 });
 
 export default mongoose.model('Bootcamp', BootcampSchema);
