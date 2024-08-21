@@ -6,7 +6,38 @@ import geocoder from "../utils/geocoder.js";
 // @route     GET /api/v1/bootcamps
 // @access    Public
 export const getAllBootcamps = (req, res, next) => {
-  Bootcamp.find().then((bootcamp) => {
+  let query;
+
+  const requestQuery = { ...req.query };
+
+  // fields to be excluded from request query
+  const removeFields = ['select', 'sort', 'page', 'limit'];
+
+  removeFields.forEach(param => delete requestQuery[param]);
+
+  let queryString = JSON.stringify(requestQuery);
+
+  // create operators ($gt, $gte, etc)
+  queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+  query = Bootcamp.find(JSON.parse(queryString));
+
+  // select Fields
+  if (req.query.select) {
+    const fields = req.query.select.split(',').join(' ');
+    query = query.select(fields);
+  }
+
+  // sort
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ');
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort('-createdAt');
+  }
+
+  query.then((bootcamp) => {
+    console.log(bootcamp.length);
     if (!bootcamp) {
       return res.status(400).json({ success: false });
     }

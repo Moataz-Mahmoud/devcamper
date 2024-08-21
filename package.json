@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server",
     "dev": "node --watch --env-file=config/config.env server",
-    "db-import": "node --env-file=config/config.env seeder --import",
+    "db-seed": "node --env-file=config/config.env seeder --import",
     "db-delete": "node --env-file=config/config.env seeder --delete"
   },
   "author": "",
