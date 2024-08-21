@@ -5,6 +5,7 @@ import {
   createBootcamp,
   updateBootcamp,
   deleteBootcamp,
+  getBootcampsInRadius
 } from '../controllers/bootcamps.js';
 
 // const Bootcamp = require('../models/Bootcamp');
@@ -32,6 +33,10 @@ router
   .route('/')
   .get(getAllBootcamps)
   .post(createBootcamp);
+
+router
+  .route('/radius')
+  .get(getBootcampsInRadius);
 
 router
   .route('/:id')

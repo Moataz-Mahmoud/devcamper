@@ -1,5 +1,6 @@
 import Bootcamp from "../models/Bootcamp.js";
 import ErrorResponse from "../utils/errorResponse.js";
+import geocoder from "../utils/geocoder.js";
 
 // @desc      Get all bootcamps
 // @route     GET /api/v1/bootcamps
@@ -153,32 +154,34 @@ export const deleteBootcamp = (req, res, next) => {
     });
 };
 
-// // @desc      Get bootcamps within a radius
-// // @route     GET /api/v1/bootcamps/radius/:zipcode/:distance
-// // @access    Private
-// exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
-//   const { zipcode, distance } = req.params;
+// @desc      Get bootcamps within a radius
+// @route     GET /api/v1/bootcamps/radius?:zipcode/:distance
+// @access    Private
+export const getBootcampsInRadius = (req, res, next) => {
+  const zipcode = req.query.zipcode;
+  const distance = req.query.distance;
 
-//   // Get lat/lng from geocoder
-//   const loc = await geocoder.geocode(zipcode);
-//   const lat = loc[0].latitude;
-//   const lng = loc[0].longitude;
+  // Get lat/lng from geocoder
+  geocoder.geocode(zipcode).then((loc) => {
+    const lat = loc[0].latitude;
+    const lng = loc[0].longitude;
 
-//   // Calc radius using radians
-//   // Divide dist by radius of Earth
-//   // Earth Radius = 3,963 mi / 6,378 km
-//   const radius = distance / 3963;
+    // Calc radius using radians
+    // Divide dist by radius of Earth
+    // Earth Radius = 3,963 mi / 6,378 km
+    const radius = parseInt(distance) / 3963;
 
-//   const bootcamps = await Bootcamp.find({
-//     location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
-//   });
-
-//   res.status(200).json({
-//     success: true,
-//     count: bootcamps.length,
-//     data: bootcamps
-//   });
-// });
+    Bootcamp.find({
+      location: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }
+    }).then((bootcamps) => {
+      res.status(200).json({
+        success: true,
+        count: bootcamps.length,
+        data: bootcamps
+      });
+    });
+  });
+};
 
 // // @desc      Upload photo for bootcamp
 // // @route     PUT /api/v1/bootcamps/:id/photo
