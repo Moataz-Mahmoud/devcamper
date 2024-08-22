@@ -36,21 +36,50 @@ export const getAllBootcamps = (req, res, next) => {
     query = query.sort('-createdAt');
   }
 
-  query.then((bootcamp) => {
-    console.log(bootcamp.length);
-    if (!bootcamp) {
-      return res.status(400).json({ success: false });
+  // pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 25;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  let pagination;
+
+  Bootcamp.countDocuments().then((total) => {
+    pagination = {};
+
+    if (endIndex < total) {
+      pagination.next = {
+        page: page + 1,
+        limit
+      };
     }
 
-    res.status(200).json({
-      success: true,
-      count: bootcamp.length,
-      data: bootcamp
-    });
-  })
-    .catch(() => {
-      next(error);
-    });
+    if (startIndex > 0) {
+      pagination.previous = {
+        page: page - 1,
+        limit
+      };
+    }
+
+    console.log(pagination);
+  }).then(() => {
+    query = query.skip(startIndex).limit(limit);
+
+    query.then((bootcamp) => {
+      if (!bootcamp) {
+        return res.status(400).json({ success: false });
+      }
+
+      res.status(200).json({
+        success: true,
+        count: bootcamp.length,
+        pagination,
+        data: bootcamp
+      });
+    })
+      .catch(() => {
+        next(error);
+      });
+  });
 };
 
 // @desc      Get single bootcamp
