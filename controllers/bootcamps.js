@@ -43,32 +43,31 @@ export const getAllBootcamps = (req, res, next) => {
   const endIndex = page * limit;
   let pagination;
 
-  Bootcamp.countDocuments().then((total) => {
-    pagination = {};
+  // start filtering from the current page
+  query = query.skip(startIndex).limit(limit);
 
-    if (endIndex < total) {
-      pagination.next = {
-        page: page + 1,
-        limit
-      };
+  query.then((bootcamp) => {
+    if (!bootcamp) {
+      return res.status(400).json({ success: false });
     }
 
-    if (startIndex > 0) {
-      pagination.previous = {
-        page: page - 1,
-        limit
-      };
-    }
+    Bootcamp.countDocuments().then((total) => {
+      pagination = {};
 
-    console.log(pagination);
-  }).then(() => {
-    query = query.skip(startIndex).limit(limit);
-
-    query.then((bootcamp) => {
-      if (!bootcamp) {
-        return res.status(400).json({ success: false });
+      if (endIndex < total) {
+        pagination.next = {
+          page: page + 1,
+          limit
+        };
       }
 
+      if (startIndex > 0) {
+        pagination.previous = {
+          page: page - 1,
+          limit
+        };
+      }
+    }).then(() => {
       res.status(200).json({
         success: true,
         count: bootcamp.length,
