@@ -20,7 +20,7 @@ export const getAllBootcamps = (req, res, next) => {
   // create operators ($gt, $gte, etc)
   queryString = queryString.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-  query = Bootcamp.find(JSON.parse(queryString));
+  query = Bootcamp.find(JSON.parse(queryString)).populate('courses');
 
   // select Fields
   if (req.query.select) {
@@ -196,21 +196,17 @@ export const deleteBootcamp = (req, res, next) => {
   //   );
   // }
 
-  Bootcamp.findByIdAndDelete(req.params.id).then((bootcamp) => {
+  Bootcamp.findById(req.params.id).then((bootcamp) => {
     if (!bootcamp) {
       return next(
         new ErrorResponse(`Bootcamp not found with id of ${req.params.id}`, 404)
       );
     }
 
-    res.status(200).json({
-      success: true,
-      data: {}
-    });
-  })
-    .catch((error) => {
-      next(error);
-    });
+    bootcamp.deleteOne(bootcamp._id).then(() =>
+      res.status(200).json({ success: true, data: {} })
+    ).catch((error) => { next(error); });
+  });
 };
 
 // @desc      Get bootcamps within a radius

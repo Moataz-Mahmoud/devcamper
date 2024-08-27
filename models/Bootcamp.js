@@ -138,4 +138,20 @@ BootcampSchema.pre('save', function (next) {
   });
 });
 
+// cascade delete courses when a bootcamp is deleted
+BootcampSchema.pre('deleteOne', { document: true, query: false }, function (next) {
+  console.log(`Courses being removed from bootcamp ${this._id}`);
+  this.model('Course').deleteMany({ bootcamp: this._id }).then(() => next());
+  // console.log(`Reviews being removed from bootcamp ${this._id}`);
+  //  await this.model('Review').deleteMany({ bootcamp: this._id });
+});
+
+// reverse populate with virtuals
+BootcampSchema.virtual('courses', {
+  ref: 'Course',
+  localField: '_id',
+  foreignField: 'bootcamp',
+  justOne: false
+});
+
 export default mongoose.model('Bootcamp', BootcampSchema);

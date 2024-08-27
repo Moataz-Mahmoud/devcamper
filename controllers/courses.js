@@ -15,7 +15,10 @@ export const getAllCourses = (req, res, next) => {
       });
     });
   } else {
-    Course.find().then((courses) => {
+    Course.find().populate({
+      path: 'bootcamp',
+      select: 'name description'
+    }).then((courses) => {
       return res.status(200).json({
         success: true,
         count: courses.length,
