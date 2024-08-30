@@ -2,7 +2,6 @@ import Course from '../models/Course.js';
 import Bootcamp from '../models/Bootcamp.js';
 
 // @desc      Get courses
-// @route     GET /api/v1/courses
 // @route     GET /api/v1/bootcamps/:bootcampId/courses
 // @access    Public
 export const getAllCourses = (req, res, next) => {
@@ -28,26 +27,26 @@ export const getAllCourses = (req, res, next) => {
   }
 };
 
-// // @desc      Get single course
-// // @route     GET /api/v1/courses/:id
-// // @access    Public
-// export const getCourse = (req, res, next) => {
-//   const course = await Course.findById(req.params.id).populate({
-//     path: 'bootcamp',
-//     select: 'name description'
-//   });
+// @desc      Get single course
+// @route     GET /api/v1/courses/:id
+// @access    Public
+export const getCourse = (req, res, next) => {
+  Course.findById(req.params.id).populate({
+    path: 'bootcamp',
+    select: 'name description'
+  }).then((course) => {
+    if (!course) {
+      return next(
+        new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
+      );
+    }
 
-//   if (!course) {
-//     return next(
-//       new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
-//     );
-//   }
-
-//   res.status(200).json({
-//     success: true,
-//     data: course
-//   });
-// };
+    res.status(200).json({
+      success: true,
+      data: course
+    });
+  });
+};
 
 // // @desc      Add course
 // // @route     POST /api/v1/bootcamps/:bootcampId/courses
