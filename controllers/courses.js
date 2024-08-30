@@ -48,41 +48,38 @@ export const getCourse = (req, res, next) => {
   });
 };
 
-// // @desc      Add course
-// // @route     POST /api/v1/bootcamps/:bootcampId/courses
-// // @access    Private
-// export const addCourse = async (req, res, next) => {
-//   req.body.bootcamp = req.params.bootcampId;
-//   req.body.user = req.user.id;
+// @desc      Add course
+// @route     POST /api/v1/bootcamps/:bootcampId/courses
+// @access    Private
+export const addCourse = (req, res, next) => {
+  req.body.bootcamp = req.params.bootcampId;
 
-//   const bootcamp = await Bootcamp.findById(req.params.bootcampId);
+  Bootcamp.findById(req.params.bootcampId).then((bootcamp) => {
+    if (!bootcamp) {
+      return next(
+        new ErrorResponse(
+          `No bootcamp with the id of ${req.params.bootcampId}`, 404)
+      );
+    }
 
-//   if (!bootcamp) {
-//     return next(
-//       new ErrorResponse(
-//         `No bootcamp with the id of ${req.params.bootcampId}`,
-//         404
-//       )
-//     );
-//   }
+    // // Make sure user is bootcamp owner
+    // if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    //   return next(
+    //     new ErrorResponse(
+    //       `User ${req.user.id} is not authorized to add a course to bootcamp ${bootcamp._id}`,
+    //       401
+    //     )
+    //   );
+    // }
 
-//   // Make sure user is bootcamp owner
-//   if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
-//     return next(
-//       new ErrorResponse(
-//         `User ${req.user.id} is not authorized to add a course to bootcamp ${bootcamp._id}`,
-//         401
-//       )
-//     );
-//   }
-
-//   const course = await Course.create(req.body);
-
-//   res.status(200).json({
-//     success: true,
-//     data: course
-//   });
-// };
+    Course.create(req.body).then((course) => {
+      res.status(200).json({
+        success: true,
+        data: course
+      });
+    });
+  });
+};
 
 // // @desc      Update course
 // // @route     PUT /api/v1/courses/:id
