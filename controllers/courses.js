@@ -81,40 +81,41 @@ export const addCourse = (req, res, next) => {
   });
 };
 
-// // @desc      Update course
-// // @route     PUT /api/v1/courses/:id
-// // @access    Private
-// export const updateCourse = async (req, res, next) => {
-//   let course = await Course.findById(req.params.id);
+// @desc      Update course
+// @route     PUT /api/v1/courses/:id
+// @access    Private
+export const updateCourse = (req, res, next) => {
+  Course.findById(req.params.id).then((course) => {
+    if (!course) {
+      return next(
+        new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
+      );
+    }
+  });
 
-//   if (!course) {
-//     return next(
-//       new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
-//     );
-//   }
+  // // Make sure user is course owner
+  // if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User ${req.user.id} is not authorized to update course ${course._id}`,
+  //       401
+  //     )
+  //   );
+  // }
 
-//   // Make sure user is course owner
-//   if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
-//     return next(
-//       new ErrorResponse(
-//         `User ${req.user.id} is not authorized to update course ${course._id}`,
-//         401
-//       )
-//     );
-//   }
+  Course.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  }).then((course) => {
+    res.status(200).json({
+      success: true,
+      data: course
+    });
+  });
 
-//   course = await Course.findByIdAndUpdate(req.params.id, req.body, {
-//     new: true,
-//     runValidators: true
-//   });
+  // course.save();
 
-//   course.save();
-
-//   res.status(200).json({
-//     success: true,
-//     data: course
-//   });
-// };
+};
 
 // // @desc      Delete course
 // // @route     DELETE /api/v1/courses/:id
