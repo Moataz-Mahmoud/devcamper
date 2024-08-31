@@ -96,10 +96,7 @@ export const getBootcamp = (req, res, next) => {
       success: true,
       data: bootcamp
     });
-  })
-    .catch((error) => {
-      next(error);
-    });
+  }).catch((error) => { next(error); });
 };
 
 // @desc      Create new bootcamp

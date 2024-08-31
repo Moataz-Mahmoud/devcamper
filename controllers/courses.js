@@ -1,4 +1,5 @@
 import Course from '../models/Course.js';
+import ErrorResponse from "../utils/errorResponse.js";
 import Bootcamp from '../models/Bootcamp.js';
 
 // @desc      Get courses
@@ -45,7 +46,7 @@ export const getCourse = (req, res, next) => {
       success: true,
       data: course
     });
-  });
+  }).catch((error) => { next(error); });
 };
 
 // @desc      Add course
@@ -117,32 +118,29 @@ export const updateCourse = (req, res, next) => {
 
 };
 
-// // @desc      Delete course
-// // @route     DELETE /api/v1/courses/:id
-// // @access    Private
-// export const deleteCourse = async (req, res, next) => {
-//   const course = await Course.findById(req.params.id);
+// @desc      Delete course
+// @route     DELETE /api/v1/courses/:id
+// @access    Private
+export const deleteCourse = async (req, res, next) => {
+  Course.findById(req.params.id).then((course) => {
+    if (!course) {
+      return next(
+        new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
+      );
+    }
 
-//   if (!course) {
-//     return next(
-//       new ErrorResponse(`No course with the id of ${req.params.id}`, 404)
-//     );
-//   }
+    course.deleteOne(course._id).then(() =>
+      res.status(200).json({ success: true, data: {} })
+    ).catch((error) => { next(error); });
+  });
 
-//   // Make sure user is course owner
-//   if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
-//     return next(
-//       new ErrorResponse(
-//         `User ${req.user.id} is not authorized to delete course ${course._id}`,
-//         401
-//       )
-//     );
-//   }
-
-//   await course.remove();
-
-//   res.status(200).json({
-//     success: true,
-//     data: {}
-//   });
-// };
+  // // Make sure user is course owner
+  // if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+  //   return next(
+  //     new ErrorResponse(
+  //       `User ${req.user.id} is not authorized to delete course ${course._id}`,
+  //       401
+  //     )
+  //   );
+  // }
+};
