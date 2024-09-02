@@ -22,16 +22,17 @@ const courses = JSON.parse(
 const importData = () => {
   Bootcamp.create(bootcamps).then(() => {
     console.log('Bootcamps Imported...');
-  }).catch((error) => {
-    console.error(error);
-  });
-
-  Course.create(courses).then(() => {
-    console.log('Courses Imported...');
     process.exit();
   }).catch((error) => {
     console.error(error);
   });
+
+  // Course.create(courses).then(() => {
+  //   console.log('Courses Imported...');
+  //   process.exit();
+  // }).catch((error) => {
+  //   console.error(error);
+  // });
 };
 
 // delete data from DB
